@@ -1,0 +1,1850 @@
+<!doctype html>
+<!--
+  세나의 노래 타일 - 로컬 실행 안내
+
+  1. 이 index.html 파일을 브라우저에서 엽니다.
+  2. 시작 버튼을 누릅니다.
+  3. PC에서는 D/F/J/K 또는 1/2/3/4 키로 테스트합니다.
+  4. 아이패드에서는 화면 아래의 큰 버튼 4개를 터치합니다.
+
+  아이패드에서 로컬 파일 실행이 불안정하면 GitHub Pages 배포를 권장합니다.
+  음악 파일 기본 위치: assets/music/sena_song.mp3
+-->
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <link rel="manifest" href="./manifest.json">
+  <link rel="apple-touch-icon" href="./assets/images/icons/apple-touch-icon.png">
+  <meta name="theme-color" content="#b85cff">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="세나의 노래 타일">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="application-name" content="세나의 노래 타일">
+  <title>세나의 노래 타일</title>
+  <style>
+    :root {
+      --app-width: 600px;
+      --judge-bottom: 76px;
+      --pink: #ff75b7;
+      --blue: #62c7ff;
+      --yellow: #ffd95a;
+      --violet: #a78bfa;
+      --mint: #7be7c7;
+      --purple-panel: #3e1379;
+      --purple-panel-dark: #23084d;
+      --gold: #ffd85b;
+      --gold-dark: #d88912;
+      --ink: #2f2458;
+      --soft-ink: #695f87;
+      --paper: rgba(255, 255, 255, 0.9);
+      --line: rgba(255, 255, 255, 0.55);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 12% 18%, rgba(255, 217, 90, 0.8), transparent 24%),
+        radial-gradient(circle at 84% 14%, rgba(98, 199, 255, 0.65), transparent 22%),
+        linear-gradient(150deg, #fff3b7 0%, #ffc0df 34%, #aee8ff 68%, #c8b6ff 100%);
+      color: var(--ink);
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      letter-spacing: 0;
+      touch-action: none;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    button {
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+      touch-action: manipulation;
+    }
+
+    .app {
+      position: relative;
+      width: min(100vw, var(--app-width));
+      height: 100vh;
+      height: 100dvh;
+      margin: 0 auto;
+      overflow: hidden;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0.12)),
+        rgba(255, 255, 255, 0.18);
+      box-shadow: 0 0 42px rgba(65, 48, 111, 0.18);
+    }
+
+    .screen {
+      position: absolute;
+      inset: 0;
+      display: none;
+      min-height: 100%;
+    }
+
+    .screen.is-active {
+      display: flex;
+    }
+
+    .start-screen {
+      position: relative;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      text-align: center;
+    }
+
+    .start-art-frame {
+      position: relative;
+      width: min(100%, calc(100dvh * 0.5577));
+      height: min(100%, calc(100vw / 0.5577));
+      max-width: 600px;
+      max-height: 100%;
+      aspect-ratio: 928 / 1664;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background:
+        radial-gradient(circle at 50% 22%, rgba(255, 255, 255, 0.82), transparent 28%),
+        linear-gradient(150deg, #fff3b7 0%, #ffc0df 34%, #aee8ff 68%, #c8b6ff 100%);
+    }
+
+    .start-screen.has-start-art .start-art-frame {
+      background-image: url("assets/images/start_screen.png");
+      background-repeat: no-repeat;
+      background-position: center;
+      background-size: contain;
+    }
+
+    .start-fallback {
+      width: min(88%, 430px);
+      padding: 28px 22px;
+      border: 2px solid rgba(255, 255, 255, 0.68);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.64);
+      box-shadow: 0 22px 55px rgba(84, 54, 137, 0.2);
+      backdrop-filter: blur(14px);
+    }
+
+    .start-screen.has-start-art .start-fallback {
+      display: none;
+    }
+
+    .song-mark {
+      display: grid;
+      place-items: center;
+      width: 76px;
+      height: 76px;
+      margin: 0 auto 16px;
+      border-radius: 50%;
+      background:
+        linear-gradient(135deg, var(--pink), var(--yellow) 48%, var(--blue));
+      color: #fff;
+      font-size: 38px;
+      font-weight: 900;
+      box-shadow: 0 14px 28px rgba(255, 117, 183, 0.3);
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(34px, 9vw, 52px);
+      line-height: 1.05;
+      color: #3e2f73;
+    }
+
+    .start-desc {
+      margin: 14px 0 24px;
+      color: var(--soft-ink);
+      font-size: clamp(16px, 4vw, 19px);
+      line-height: 1.5;
+    }
+
+    .primary-button {
+      min-width: 190px;
+      min-height: 58px;
+      padding: 0 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff6fb1, #ffcc4d);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 0 13px 0 #c95a8d, 0 18px 34px rgba(201, 90, 141, 0.25);
+      transition: transform 120ms ease, box-shadow 120ms ease;
+    }
+
+    .primary-button:active {
+      transform: translateY(7px);
+      box-shadow: 0 6px 0 #c95a8d, 0 12px 20px rgba(201, 90, 141, 0.2);
+    }
+
+    .start-button-overlay {
+      position: absolute;
+      left: 50%;
+      bottom: 12.8%;
+      z-index: 2;
+      width: 64%;
+      height: 10.8%;
+      min-height: 62px;
+      border: 0;
+      border-radius: 999px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.02));
+      color: transparent;
+      transform: translateX(-50%);
+      transition: transform 90ms ease, background 90ms ease, box-shadow 90ms ease;
+    }
+
+    .start-screen.has-start-art .start-button-overlay {
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.02);
+    }
+
+    .start-button-overlay:active {
+      transform: translateX(-50%) scale(0.96);
+      background: rgba(255, 255, 255, 0.12);
+      box-shadow: 0 0 26px rgba(255, 255, 255, 0.38);
+    }
+
+    .start-screen:not(.has-start-art) .start-button-overlay {
+      position: absolute;
+      left: 50%;
+      top: calc(50% + 120px);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: auto;
+      height: auto;
+      min-width: 190px;
+      min-height: 58px;
+      margin-top: 24px;
+      padding: 0 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #ff6fb1, #ffcc4d);
+      color: #fff;
+      font-size: 20px;
+      font-weight: 900;
+      box-shadow: 0 13px 0 #c95a8d, 0 18px 34px rgba(201, 90, 141, 0.25);
+      transform: translateX(-50%);
+    }
+
+    .start-screen:not(.has-start-art) .start-button-overlay:active {
+      transform: translateX(-50%) translateY(7px);
+      box-shadow: 0 6px 0 #c95a8d, 0 12px 20px rgba(201, 90, 141, 0.2);
+    }
+
+    .start-button-label {
+      pointer-events: none;
+    }
+
+    .audio-note {
+      position: absolute;
+      left: 50%;
+      bottom: max(8px, env(safe-area-inset-bottom));
+      z-index: 3;
+      width: min(84%, 430px);
+      min-height: 24px;
+      margin: 0;
+      color: #746790;
+      font-size: 13px;
+      line-height: 1.45;
+      transform: translateX(-50%);
+    }
+
+    .start-screen.has-start-art .audio-note {
+      color: #fff;
+      text-shadow: 0 2px 6px rgba(82, 31, 131, 0.8);
+    }
+
+    .game-screen {
+      flex-direction: column;
+      padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom));
+      gap: 8px;
+      background-image:
+        linear-gradient(180deg, rgba(54, 17, 101, 0.38), rgba(255, 116, 197, 0.18)),
+        url("assets/images/gameplay_background.png");
+      background-position: center;
+      background-size: cover;
+    }
+
+    .hud {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+      min-height: 68px;
+      padding: 4px;
+      border: 2px solid rgba(255, 218, 91, 0.58);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, rgba(139, 66, 229, 0.78), rgba(58, 13, 117, 0.8)),
+        rgba(45, 7, 91, 0.72);
+      box-shadow: 0 5px 0 rgba(86, 32, 143, 0.48), 0 10px 24px rgba(38, 13, 77, 0.32);
+    }
+
+    .hud-item {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      min-width: 0;
+      overflow: hidden;
+      padding: 8px 5px 7px;
+      border: 2px solid rgba(255, 220, 92, 0.9);
+      border-radius: 8px;
+      background:
+        radial-gradient(circle at 82% 28%, rgba(255, 255, 255, 0.28), transparent 18%),
+        linear-gradient(180deg, rgba(146, 70, 233, 0.95), rgba(47, 14, 101, 0.96) 58%, rgba(31, 7, 71, 0.98));
+      text-align: center;
+      box-shadow:
+        inset 0 2px 0 rgba(255, 255, 255, 0.38),
+        inset 0 -5px 0 rgba(27, 6, 61, 0.35),
+        0 5px 0 rgba(124, 61, 181, 0.5);
+    }
+
+    .hud-item::before,
+    .hud-item::after {
+      content: "★";
+      position: absolute;
+      color: var(--gold);
+      font-size: 13px;
+      text-shadow: 0 1px 0 #9c4f07, 0 0 8px rgba(255, 238, 135, 0.95);
+      pointer-events: none;
+    }
+
+    .hud-item::before {
+      left: 7px;
+      top: 5px;
+    }
+
+    .hud-item::after {
+      right: 7px;
+      bottom: 5px;
+      font-size: 12px;
+    }
+
+    .hud-label {
+      color: #ffe783;
+      font-size: 11px;
+      font-weight: 800;
+      text-shadow: 0 1px 0 #6d2a99, 0 0 8px rgba(255, 236, 128, 0.5);
+    }
+
+    .hud-value {
+      margin-top: 2px;
+      color: #fff;
+      font-size: clamp(19px, 5vw, 27px);
+      font-weight: 950;
+      white-space: nowrap;
+      text-shadow: 0 3px 0 #5a229b, 0 0 10px rgba(255, 255, 255, 0.45);
+    }
+
+    .playfield {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 330px;
+      overflow: hidden;
+      border: 3px solid rgba(255, 216, 91, 0.78);
+      border-radius: 8px;
+      background-image:
+        linear-gradient(180deg, rgba(41, 9, 86, 0.32), rgba(28, 8, 72, 0.5)),
+        url("assets/images/gameplay_background.png"),
+        linear-gradient(180deg, #351171 0%, #a531bc 52%, #2c94e8 100%);
+      background-position: center;
+      background-size: cover;
+      box-shadow:
+        inset 0 0 0 2px rgba(255, 255, 255, 0.18),
+        inset 0 -18px 44px rgba(34, 9, 81, 0.32),
+        0 16px 32px rgba(57, 40, 98, 0.22);
+    }
+
+    .lane-grid {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      pointer-events: none;
+    }
+
+    .lane {
+      position: relative;
+      border-left: 1px solid rgba(255, 255, 255, 0.22);
+      border-right: 1px solid rgba(34, 8, 70, 0.22);
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(28, 8, 72, 0.18));
+    }
+
+    .lane:nth-child(1) {
+      background-color: rgba(255, 79, 163, 0.18);
+    }
+
+    .lane:nth-child(2) {
+      background-color: rgba(255, 201, 40, 0.16);
+    }
+
+    .lane:nth-child(3) {
+      background-color: rgba(37, 183, 255, 0.17);
+    }
+
+    .lane:nth-child(4) {
+      background-color: rgba(154, 84, 255, 0.18);
+    }
+
+    .tile-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .tile {
+      position: absolute;
+      overflow: hidden;
+      border: 3px solid rgba(255, 255, 255, 0.9);
+      border-radius: 14px;
+      background:
+        radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.78), transparent 16%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.58), rgba(255, 255, 255, 0.12) 34%, rgba(0, 0, 0, 0.12) 100%),
+        var(--tile-color, #ff75b7);
+      box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.48),
+        inset 0 -6px 0 rgba(91, 31, 132, 0.2),
+        0 6px 0 rgba(70, 22, 110, 0.3),
+        0 12px 20px rgba(40, 8, 87, 0.22);
+      transform: translate3d(0, 0, 0);
+      will-change: transform, opacity;
+    }
+
+    .tile.is-double {
+      outline: 3px solid rgba(255, 231, 128, 0.78);
+      outline-offset: -9px;
+      box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -6px 0 rgba(91, 31, 132, 0.2),
+        0 0 18px rgba(255, 232, 130, 0.44),
+        0 6px 0 rgba(70, 22, 110, 0.3),
+        0 12px 20px rgba(40, 8, 87, 0.22);
+    }
+
+    .tile.is-hold {
+      background:
+        radial-gradient(circle at 30% 9%, rgba(255, 255, 255, 0.82), transparent 12%),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.44), transparent 22%, rgba(255, 255, 255, 0.24) 50%, transparent 76%),
+        linear-gradient(180deg, rgba(255, 255, 255, 0.62), rgba(255, 255, 255, 0.1) 32%, rgba(255, 255, 255, 0.28)),
+        var(--tile-color, #ff75b7);
+      box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.5),
+        inset 0 -7px 0 rgba(91, 31, 132, 0.18),
+        0 6px 0 rgba(70, 22, 110, 0.28),
+        0 0 20px rgba(255, 255, 255, 0.42),
+        0 16px 28px rgba(65, 46, 112, 0.22);
+    }
+
+    .tile.is-holding {
+      animation: holdGlow 520ms ease-in-out infinite alternate;
+    }
+
+    .tile.is-release-gap {
+      filter: brightness(0.94) saturate(0.9);
+    }
+
+    .tile.is-hit {
+      opacity: 0.18;
+      filter: saturate(0.8);
+    }
+
+    .tile::before,
+    .tile::after {
+      content: "♪";
+      position: absolute;
+      color: rgba(255, 255, 255, 0.84);
+      font-weight: 950;
+      text-shadow: 0 2px 0 rgba(91, 31, 132, 0.22), 0 0 8px rgba(255, 255, 255, 0.8);
+      pointer-events: none;
+    }
+
+    .tile::before {
+      left: 50%;
+      top: 50%;
+      font-size: 27px;
+      transform: translate(-50%, -50%);
+    }
+
+    .tile::after {
+      content: "★";
+      right: 10px;
+      top: 8px;
+      color: rgba(255, 246, 169, 0.9);
+      font-size: 12px;
+      transform: none;
+    }
+
+    .tile.is-double::before {
+      content: "★";
+      color: #fff8a8;
+    }
+
+    .tile.is-hold::before {
+      top: 24px;
+      transform: translateX(-50%);
+    }
+
+    .tile.is-hold::after {
+      content: "⌄";
+      left: 50%;
+      right: auto;
+      top: auto;
+      bottom: 8px;
+      color: rgba(255, 255, 255, 0.72);
+      font-size: 22px;
+      transform: translateX(-50%);
+    }
+
+    @keyframes holdGlow {
+      from {
+        filter: brightness(1);
+        box-shadow:
+          inset 0 3px 0 rgba(255, 255, 255, 0.54),
+          inset 0 -7px 0 rgba(91, 31, 132, 0.16),
+          0 6px 0 rgba(70, 22, 110, 0.28),
+          0 0 18px rgba(255, 255, 255, 0.48),
+          0 16px 28px rgba(65, 46, 112, 0.22);
+      }
+
+      to {
+        filter: brightness(1.14);
+        box-shadow:
+          inset 0 3px 0 rgba(255, 255, 255, 0.62),
+          inset 0 -7px 0 rgba(91, 31, 132, 0.14),
+          0 6px 0 rgba(70, 22, 110, 0.28),
+          0 0 34px rgba(255, 255, 255, 0.9),
+          0 16px 28px rgba(65, 46, 112, 0.22);
+      }
+    }
+
+    .judge-line {
+      position: absolute;
+      left: 22px;
+      right: 22px;
+      bottom: var(--judge-bottom);
+      height: 10px;
+      border-radius: 999px;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.95), rgba(255, 119, 241, 0.82) 42%, rgba(164, 75, 255, 0.9)),
+        linear-gradient(90deg, #ff6bd4, #fff3a5, #6bd8ff, #bc74ff);
+      box-shadow:
+        0 0 0 4px rgba(255, 255, 255, 0.26),
+        0 0 20px rgba(255, 98, 235, 0.85),
+        0 0 36px rgba(255, 230, 129, 0.46);
+      pointer-events: none;
+    }
+
+    .judge-line::before,
+    .judge-line::after {
+      content: "☆";
+      position: absolute;
+      top: 50%;
+      display: grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: radial-gradient(circle at 34% 28%, #fff9b7, #ffd94e 55%, #ff9f22);
+      color: #fff;
+      font-size: 27px;
+      font-weight: 950;
+      text-shadow: 0 2px 0 #cf7410;
+      box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.68), 0 0 22px rgba(255, 232, 112, 0.9);
+    }
+
+    .judge-line::before {
+      left: -24px;
+      transform: translateY(-50%);
+    }
+
+    .judge-line::after {
+      right: -24px;
+      transform: translateY(-50%);
+    }
+
+    .judge-line.is-flash {
+      animation: judgeFlash 180ms ease-out;
+    }
+
+    .judge-label {
+      position: absolute;
+      left: 50%;
+      bottom: calc(var(--judge-bottom) + 14px);
+      transform: translateX(-50%);
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 2px solid rgba(255, 218, 91, 0.72);
+      background: linear-gradient(180deg, rgba(126, 54, 215, 0.82), rgba(60, 17, 123, 0.86));
+      color: #fff7a8;
+      font-size: 12px;
+      font-weight: 900;
+      text-shadow: 0 1px 0 #521488;
+      pointer-events: none;
+    }
+
+    @keyframes judgeFlash {
+      0% {
+        filter: brightness(1);
+      }
+
+      48% {
+        filter: brightness(1.8);
+        box-shadow:
+          0 0 0 6px rgba(255, 255, 255, 0.42),
+          0 0 30px rgba(255, 255, 255, 0.95),
+          0 0 52px rgba(255, 230, 129, 0.8);
+      }
+
+      100% {
+        filter: brightness(1);
+      }
+    }
+
+    .round-bubble,
+    .hit-bubble {
+      position: absolute;
+      left: 50%;
+      z-index: 5;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      text-align: center;
+    }
+
+    .round-bubble {
+      top: 42%;
+      min-width: 180px;
+      padding: 14px 20px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.82);
+      color: #3b2b69;
+      font-size: 24px;
+      font-weight: 950;
+      box-shadow: 0 16px 30px rgba(65, 46, 112, 0.18);
+      opacity: 0;
+      transition: opacity 180ms ease, transform 180ms ease;
+    }
+
+    .round-bubble.show {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1.03);
+    }
+
+    .hit-bubble {
+      top: 57%;
+      min-width: 150px;
+      padding: 10px 18px 14px;
+      border: 3px solid rgba(255, 228, 93, 0.9);
+      border-radius: 8px;
+      background:
+        linear-gradient(180deg, #7fe7ff, #1689e6 55%, #0d4bba);
+      color: #fff;
+      font-size: 28px;
+      font-weight: 950;
+      text-shadow: 0 3px 0 #063d9a, 0 0 12px rgba(255, 255, 255, 0.58);
+      box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.52),
+        0 7px 0 #5a229b,
+        0 0 28px rgba(102, 215, 255, 0.68);
+      opacity: 0;
+      transition: opacity 120ms ease, transform 180ms ease, filter 120ms ease;
+    }
+
+    .hit-bubble::before,
+    .hit-bubble::after {
+      content: "♪";
+      position: absolute;
+      top: -18px;
+      color: #7adfff;
+      font-size: 22px;
+      text-shadow: 0 2px 0 #0c5fc7, 0 0 10px rgba(255, 255, 255, 0.7);
+    }
+
+    .hit-bubble::before {
+      left: 12px;
+      transform: rotate(-16deg);
+    }
+
+    .hit-bubble::after {
+      right: 12px;
+      transform: rotate(15deg);
+    }
+
+    .hit-bubble.is-perfect {
+      background: linear-gradient(180deg, #fff584, #ff8b34 52%, #e42e91);
+      text-shadow: 0 3px 0 #a5166f, 0 0 12px rgba(255, 255, 255, 0.65);
+      box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.55),
+        0 7px 0 #7e218c,
+        0 0 34px rgba(255, 226, 97, 0.82);
+    }
+
+    .hit-bubble.show {
+      opacity: 1;
+      transform: translate(-50%, -60%) scale(1.1);
+    }
+
+    .touch-pad {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      min-height: 86px;
+    }
+
+    .lane-button {
+      position: relative;
+      min-height: 78px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1px;
+      border: 3px solid rgba(255, 255, 255, 0.88);
+      border-radius: 18px;
+      color: #fff;
+      font-size: clamp(17px, 4vw, 22px);
+      font-weight: 950;
+      text-shadow: 0 2px 0 rgba(82, 31, 131, 0.32);
+      box-shadow:
+        inset 0 4px 0 rgba(255, 255, 255, 0.46),
+        inset 0 -7px 0 rgba(92, 23, 128, 0.24),
+        0 8px 0 rgba(66, 28, 116, 0.34),
+        0 12px 22px rgba(69, 48, 112, 0.22);
+      transition: transform 80ms ease, filter 80ms ease, box-shadow 80ms ease;
+    }
+
+    .lane-button .button-note {
+      position: relative;
+      z-index: 1;
+      display: block;
+      font-size: clamp(31px, 8vw, 43px);
+      line-height: 0.95;
+      filter: drop-shadow(0 3px 0 rgba(91, 31, 132, 0.28));
+    }
+
+    .lane-button .button-key {
+      position: relative;
+      z-index: 1;
+      display: block;
+      font-size: 12px;
+      font-weight: 900;
+      opacity: 0.95;
+      letter-spacing: 0;
+    }
+
+    .lane-button::before {
+      content: "";
+      position: absolute;
+      inset: 7px 8px auto;
+      height: 38%;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.72), rgba(255, 255, 255, 0.1));
+      border: 1px solid rgba(255, 255, 255, 0.28);
+      pointer-events: none;
+    }
+
+    .lane-button::after {
+      content: "★";
+      position: absolute;
+      right: 10px;
+      bottom: 9px;
+      color: rgba(255, 247, 169, 0.84);
+      font-size: 13px;
+      text-shadow: 0 1px 0 rgba(139, 78, 10, 0.45), 0 0 8px rgba(255, 255, 255, 0.72);
+      pointer-events: none;
+    }
+
+    .lane-button[data-lane="0"] {
+      background: radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.52), transparent 19%), linear-gradient(180deg, #ff89c7, #ff3d98 58%, #c91f73);
+    }
+
+    .lane-button[data-lane="1"] {
+      background: radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.56), transparent 19%), linear-gradient(180deg, #ffe680, #ffbd21 58%, #d57d09);
+    }
+
+    .lane-button[data-lane="2"] {
+      background: radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.58), transparent 19%), linear-gradient(180deg, #83e4ff, #22acef 58%, #1375c9);
+    }
+
+    .lane-button[data-lane="3"] {
+      background: radial-gradient(circle at 28% 18%, rgba(255, 255, 255, 0.54), transparent 19%), linear-gradient(180deg, #c184ff, #8b3dff 58%, #5b1ec4);
+    }
+
+    .lane-button.is-pressed {
+      transform: translateY(6px) scale(0.96);
+      filter: brightness(1.18);
+      box-shadow:
+        inset 0 4px 0 rgba(255, 255, 255, 0.52),
+        inset 0 -4px 0 rgba(92, 23, 128, 0.2),
+        0 2px 0 rgba(66, 28, 116, 0.34),
+        0 0 22px rgba(255, 236, 128, 0.55);
+    }
+
+    .result-screen {
+      align-items: stretch;
+      justify-content: center;
+      padding: max(12px, env(safe-area-inset-top)) 12px max(12px, env(safe-area-inset-bottom));
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .result-art {
+      position: relative;
+      width: 100%;
+      max-width: 560px;
+      min-height: 100%;
+      overflow: hidden;
+      border-radius: 8px;
+      background-position: center;
+      background-size: cover;
+      box-shadow: 0 20px 44px rgba(69, 48, 112, 0.22);
+    }
+
+    .result-art::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.32), rgba(255, 255, 255, 0.1)),
+        radial-gradient(circle at 50% 30%, rgba(255, 255, 255, 0.38), transparent 34%);
+    }
+
+    .result-art.is-clear {
+      background-image:
+        url("assets/images/result_clear.png"),
+        linear-gradient(150deg, #fff1a8 0%, #ff9fd0 45%, #92ddff 100%);
+    }
+
+    .result-art.is-miss {
+      background-image:
+        url("assets/images/result_miss.png"),
+        linear-gradient(150deg, #d9f1ff 0%, #ffc3dd 48%, #fff0ae 100%);
+    }
+
+    .result-copy {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      top: 9%;
+      z-index: 1;
+      padding: 16px 14px;
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.62);
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .result-title {
+      margin: 0;
+      color: #3d2b70;
+      font-size: clamp(30px, 8vw, 48px);
+      line-height: 1.1;
+      font-weight: 950;
+    }
+
+    .result-subtitle {
+      margin: 8px 0 0;
+      color: #675982;
+      font-size: 16px;
+      font-weight: 750;
+    }
+
+    .retry-button {
+      position: absolute;
+      left: 50%;
+      bottom: 10%;
+      z-index: 2;
+      width: min(78%, 330px);
+      min-height: 66px;
+      transform: translateX(-50%);
+      border: 2px solid rgba(255, 255, 255, 0.86);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.76);
+      color: #3d2b70;
+      font-size: 22px;
+      font-weight: 950;
+      box-shadow: 0 10px 0 rgba(82, 61, 129, 0.2), 0 18px 32px rgba(63, 41, 109, 0.22);
+      backdrop-filter: blur(8px);
+    }
+
+    .retry-button:active {
+      bottom: calc(10% - 6px);
+      box-shadow: 0 4px 0 rgba(82, 61, 129, 0.2), 0 12px 22px rgba(63, 41, 109, 0.16);
+    }
+
+    .sr-only {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      clip: rect(0, 0, 0, 0);
+      white-space: nowrap;
+      border: 0;
+    }
+
+    @media (max-height: 650px) {
+      .hud {
+        min-height: 50px;
+      }
+
+      .playfield {
+        min-height: 270px;
+      }
+
+      .touch-pad {
+        min-height: 76px;
+      }
+
+      .lane-button {
+        min-height: 70px;
+      }
+
+      .result-copy {
+        top: 6%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-label="세나의 노래 타일 게임">
+    <section id="startScreen" class="screen start-screen is-active">
+      <div class="start-art-frame" aria-label="세나의 노래 타일 시작 화면">
+        <div class="start-fallback">
+          <div class="song-mark" aria-hidden="true">♪</div>
+          <h1>세나의 노래 타일</h1>
+          <p class="start-desc">세나가 부른 노래로 즐기는 리듬 게임</p>
+        </div>
+        <button id="startButton" class="start-button-overlay" type="button" aria-label="게임 시작">
+          <span class="start-button-label">시작</span>
+        </button>
+        <p id="audioNote" class="audio-note" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section id="gameScreen" class="screen game-screen" aria-label="게임 화면">
+      <div class="hud" aria-live="polite">
+        <div class="hud-item">
+          <span class="hud-label">점수</span>
+          <strong id="scoreValue" class="hud-value">0</strong>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">콤보</span>
+          <strong id="comboValue" class="hud-value">0</strong>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">속도</span>
+          <strong id="speedValue" class="hud-value">x1.0</strong>
+        </div>
+        <div class="hud-item">
+          <span class="hud-label">라운드</span>
+          <strong id="roundValue" class="hud-value">1/3</strong>
+        </div>
+      </div>
+
+      <div id="playfield" class="playfield">
+        <div class="lane-grid" aria-hidden="true">
+          <div class="lane"></div>
+          <div class="lane"></div>
+          <div class="lane"></div>
+          <div class="lane"></div>
+        </div>
+        <div id="tileLayer" class="tile-layer" aria-hidden="true"></div>
+        <div class="judge-label" aria-hidden="true">타이밍</div>
+        <div id="judgeLine" class="judge-line" aria-hidden="true"></div>
+        <div id="roundBubble" class="round-bubble" aria-live="polite"></div>
+        <div id="hitBubble" class="hit-bubble" aria-live="polite">좋아요!</div>
+      </div>
+
+      <div class="touch-pad" aria-label="터치 버튼">
+        <button class="lane-button" data-lane="0" type="button" aria-label="1번 라인">
+          <span class="button-note">♪</span>
+          <span class="button-key">D / 1</span>
+        </button>
+        <button class="lane-button" data-lane="1" type="button" aria-label="2번 라인">
+          <span class="button-note">♪</span>
+          <span class="button-key">F / 2</span>
+        </button>
+        <button class="lane-button" data-lane="2" type="button" aria-label="3번 라인">
+          <span class="button-note">♪</span>
+          <span class="button-key">J / 3</span>
+        </button>
+        <button class="lane-button" data-lane="3" type="button" aria-label="4번 라인">
+          <span class="button-note">♪</span>
+          <span class="button-key">K / 4</span>
+        </button>
+      </div>
+    </section>
+
+    <section id="resultScreen" class="screen result-screen" aria-label="결과 화면">
+      <div id="resultArt" class="result-art">
+        <div class="result-copy">
+          <h2 id="resultTitle" class="result-title">성공!</h2>
+          <p id="resultSubtitle" class="result-subtitle">세나의 노래를 끝까지 지켰어요.</p>
+        </div>
+        <button id="retryButton" class="retry-button" type="button">다시하기</button>
+      </div>
+    </section>
+
+    <p class="sr-only" id="statusText" aria-live="assertive"></p>
+  </main>
+
+  <script>
+    /*
+      세나의 노래 타일 v0.1
+      - 외부 라이브러리 없이 HTML/CSS/JavaScript만 사용합니다.
+      - 나중에 파일 선택 기능을 추가하기 쉽도록 SONG_PATH만 따로 두었습니다.
+    */
+    const START_SCREEN_PATH = "assets/images/start_screen.png";
+    const SONG_PATH = "assets/music/sena_song.mp3";
+    const TOTAL_ROUNDS = 3;
+    const ROUND_SETTINGS = [
+      { round: 1, rate: 1.0, spawnInterval: 850, travelMs: 2500, doubleChance: 0.15, holdChance: 0.1 },
+      { round: 2, rate: 1.5, spawnInterval: 650, travelMs: 1950, doubleChance: 0.17, holdChance: 0.12 },
+      { round: 3, rate: 2.0, spawnInterval: 500, travelMs: 1650, doubleChance: 0.18, holdChance: 0.13 }
+    ];
+
+    const TAP_NOTE_HEIGHT = 58;
+    const NOTE_START_Y = -90;
+    const DOUBLE_GRACE_MS = 280;
+    const HOLD_MIN_MS = 800;
+    const HOLD_MAX_MS = 1400;
+    const HOLD_START_WINDOW = 120;
+    const HOLD_REQUIRED_RATIO = 0.5;
+    const HOLD_PERFECT_RATIO = 0.8;
+    const HOLD_ALLOWED_RELEASE_MS = 300;
+    const TILE_COLORS = ["#ff4fa3", "#ffc928", "#25b7ff", "#9a54ff"];
+    const HIT_WORDS = ["GOOD!", "PERFECT!", "잘했어요!", "반짝!"];
+
+    const startScreen = document.getElementById("startScreen");
+    const gameScreen = document.getElementById("gameScreen");
+    const resultScreen = document.getElementById("resultScreen");
+    const startButton = document.getElementById("startButton");
+    const retryButton = document.getElementById("retryButton");
+    const audioNote = document.getElementById("audioNote");
+    const playfield = document.getElementById("playfield");
+    const tileLayer = document.getElementById("tileLayer");
+    const judgeLine = document.getElementById("judgeLine");
+    const roundBubble = document.getElementById("roundBubble");
+    const hitBubble = document.getElementById("hitBubble");
+    const statusText = document.getElementById("statusText");
+    const scoreValue = document.getElementById("scoreValue");
+    const comboValue = document.getElementById("comboValue");
+    const speedValue = document.getElementById("speedValue");
+    const roundValue = document.getElementById("roundValue");
+    const resultArt = document.getElementById("resultArt");
+    const resultTitle = document.getElementById("resultTitle");
+    const resultSubtitle = document.getElementById("resultSubtitle");
+    const laneButtons = Array.from(document.querySelectorAll(".lane-button"));
+
+    const audio = new Audio(SONG_PATH);
+    audio.preload = "auto";
+    audio.playsInline = true;
+
+    let gameState = "start";
+    let score = 0;
+    let combo = 0;
+    let currentRoundIndex = 0;
+    let tiles = [];
+    let nextNoteId = 1;
+    let animationId = 0;
+    let lastFrameTime = 0;
+    let nextSpawnAt = 0;
+    let lastLane = -1;
+    let sameLaneCount = 0;
+    let specialNoteCooldown = 0;
+    let roundClockTimer = 0;
+    let usingFallbackClock = false;
+    let playfieldRect = null;
+    let judgeY = 0;
+    let laneWidth = 0;
+    let hitWindow = 86;
+    let pressedLanes = new Set();
+    let activeKeys = new Set();
+    let activePointers = new Map();
+    let lanePressCounts = [0, 0, 0, 0];
+
+    function showScreen(screenName) {
+      startScreen.classList.toggle("is-active", screenName === "start");
+      gameScreen.classList.toggle("is-active", screenName === "game");
+      resultScreen.classList.toggle("is-active", screenName === "result");
+    }
+
+    function setupStartScreenImage() {
+      const image = new Image();
+
+      image.onload = () => {
+        startScreen.classList.add("has-start-art");
+      };
+
+      image.onerror = () => {
+        startScreen.classList.remove("has-start-art");
+      };
+
+      image.src = START_SCREEN_PATH;
+    }
+
+    function updateHud() {
+      const settings = ROUND_SETTINGS[currentRoundIndex];
+      scoreValue.textContent = String(score);
+      comboValue.textContent = String(combo);
+      speedValue.textContent = "x" + settings.rate.toFixed(1);
+      roundValue.textContent = settings.round + "/" + TOTAL_ROUNDS;
+    }
+
+    function measurePlayfield() {
+      playfieldRect = playfield.getBoundingClientRect();
+      laneWidth = playfieldRect.width / 4;
+
+      // 판정선의 중앙 위치를 게임판 안의 y 좌표로 바꿉니다.
+      const judgeRect = judgeLine.getBoundingClientRect();
+      judgeY = judgeRect.top - playfieldRect.top + judgeRect.height / 2;
+
+      // 화면이 커져도 너무 빡빡하지 않도록 판정 범위를 조금 넉넉하게 둡니다.
+      hitWindow = Math.max(82, Math.min(104, playfieldRect.height * 0.14));
+      updateTileLayout();
+    }
+
+    function updateTileLayout() {
+      for (const note of tiles) {
+        const tileWidth = laneWidth * 0.72;
+        const top = getNoteTop(note);
+
+        for (const tile of note.elements) {
+          const lane = Number(tile.dataset.lane);
+          tile.style.width = tileWidth + "px";
+          tile.style.height = note.height + "px";
+          tile.style.left = (lane * laneWidth + laneWidth * 0.14) + "px";
+          tile.style.transform = "translate3d(0, " + top + "px, 0)";
+        }
+      }
+    }
+
+    function resetGameValues() {
+      stopAnimation();
+      stopRoundClock();
+      audio.pause();
+      audio.currentTime = 0;
+      score = 0;
+      combo = 0;
+      currentRoundIndex = 0;
+      nextNoteId = 1;
+      lastLane = -1;
+      sameLaneCount = 0;
+      specialNoteCooldown = 0;
+      resetPressedInputs();
+      clearTiles();
+      updateHud();
+    }
+
+    function clearTiles() {
+      tiles = [];
+      tileLayer.textContent = "";
+    }
+
+    function startGame() {
+      resetGameValues();
+      gameState = "playing";
+      showScreen("game");
+      measurePlayfield();
+      startRound();
+    }
+
+    function startRound() {
+      const settings = ROUND_SETTINGS[currentRoundIndex];
+      clearTiles();
+      updateHud();
+      measurePlayfield();
+      showRoundBubble("라운드 " + settings.round + "  x" + settings.rate.toFixed(1));
+
+      lastFrameTime = performance.now();
+      nextSpawnAt = lastFrameTime + 600;
+      gameState = "playing";
+      startAnimation();
+      playSongForRound(settings);
+    }
+
+    async function playSongForRound(settings) {
+      stopRoundClock();
+      usingFallbackClock = false;
+
+      try {
+        audio.pause();
+        audio.currentTime = 0;
+        audio.playbackRate = settings.rate;
+        audio.defaultPlaybackRate = settings.rate;
+        await audio.play();
+        audioNote.textContent = "";
+      } catch (error) {
+        // 음악 파일이 아직 없거나 브라우저가 재생을 막으면 게임 로직만 테스트합니다.
+        usingFallbackClock = true;
+        audioNote.textContent = "음악 파일을 넣으면 노래 길이에 맞춰 진행됩니다. 지금은 연습용 시간으로 실행 중입니다.";
+        startFallbackRoundClock(settings);
+      }
+    }
+
+    function startFallbackRoundClock(settings) {
+      const practiceDuration = 24000 / settings.rate;
+      roundClockTimer = window.setTimeout(() => {
+        finishRound();
+      }, practiceDuration);
+    }
+
+    function stopRoundClock() {
+      if (roundClockTimer) {
+        window.clearTimeout(roundClockTimer);
+        roundClockTimer = 0;
+      }
+    }
+
+    function startAnimation() {
+      stopAnimation();
+      animationId = window.requestAnimationFrame(gameLoop);
+    }
+
+    function stopAnimation() {
+      if (animationId) {
+        window.cancelAnimationFrame(animationId);
+        animationId = 0;
+      }
+    }
+
+    function gameLoop(now) {
+      if (gameState !== "playing") {
+        return;
+      }
+
+      const delta = Math.min(48, now - lastFrameTime);
+      lastFrameTime = now;
+
+      if (now >= nextSpawnAt) {
+        const note = spawnNote();
+        nextSpawnAt = now + getNextSpawnDelay(ROUND_SETTINGS[currentRoundIndex], note);
+      }
+
+      moveTiles(delta, now);
+      animationId = window.requestAnimationFrame(gameLoop);
+    }
+
+    function getNextSpawnDelay(settings, previousNote) {
+      const jitter = Math.random() * 110 - 55;
+      const baseDelay = Math.max(420, settings.spawnInterval + jitter);
+
+      if (previousNote && previousNote.type === "hold") {
+        return Math.max(baseDelay, previousNote.duration + 320);
+      }
+
+      return baseDelay;
+    }
+
+    function getNoteSpeed(settings) {
+      return (judgeY - NOTE_START_Y) / settings.travelMs;
+    }
+
+    function getNoteTop(note) {
+      if (note.type === "hold") {
+        return note.y - note.height + TAP_NOTE_HEIGHT / 2;
+      }
+
+      return note.y - note.height / 2;
+    }
+
+    function getHoldTailY(note) {
+      return note.y - (note.height - TAP_NOTE_HEIGHT);
+    }
+
+    function spawnNote() {
+      const settings = ROUND_SETTINGS[currentRoundIndex];
+      const type = chooseNoteType(settings);
+      const lanes = type === "double" ? chooseDoubleLanes() : [chooseLane()];
+      const speed = getNoteSpeed(settings);
+      const duration = type === "hold" ? randomBetween(HOLD_MIN_MS, HOLD_MAX_MS) : 0;
+      const holdPixels = type === "hold" ? Math.max(90, duration * speed) : 0;
+      const now = performance.now();
+
+      const note = {
+        id: nextNoteId,
+        type,
+        lanes,
+        spawnTime: now,
+        hitTime: now + (judgeY - NOTE_START_Y) / speed,
+        duration,
+        judged: false,
+        holdStarted: false,
+        holdCompleted: false,
+        holdTime: 0,
+        releasedTime: 0,
+        requiredHoldRatio: HOLD_REQUIRED_RATIO,
+        allowedReleaseMs: HOLD_ALLOWED_RELEASE_MS,
+        hitLanes: new Set(),
+        firstHitAt: 0,
+        y: NOTE_START_Y,
+        height: type === "hold" ? TAP_NOTE_HEIGHT + holdPixels : TAP_NOTE_HEIGHT,
+        elements: []
+      };
+
+      nextNoteId += 1;
+
+      for (const lane of lanes) {
+        const tile = document.createElement("div");
+        tile.className = "tile";
+        tile.dataset.lane = String(lane);
+        tile.dataset.noteId = String(note.id);
+        tile.style.setProperty("--tile-color", TILE_COLORS[lane]);
+
+        if (type === "double") {
+          tile.classList.add("is-double");
+        }
+
+        if (type === "hold") {
+          tile.classList.add("is-hold");
+        }
+
+        note.elements.push(tile);
+        tileLayer.appendChild(tile);
+      }
+
+      tiles.push(note);
+      updateTileLayout();
+      return note;
+    }
+
+    function chooseNoteType(settings) {
+      if (specialNoteCooldown > 0) {
+        specialNoteCooldown -= 1;
+        return "tap";
+      }
+
+      const roll = Math.random();
+      let type = "tap";
+
+      if (roll < settings.holdChance) {
+        type = "hold";
+      } else if (roll < settings.holdChance + settings.doubleChance) {
+        type = "double";
+      }
+
+      if (type !== "tap") {
+        specialNoteCooldown = 1;
+      }
+
+      return type;
+    }
+
+    function chooseLane() {
+      let lane = Math.floor(Math.random() * 4);
+
+      // 같은 라인이 3번 이상 이어지지 않게 살짝 보정합니다.
+      if (lane === lastLane && sameLaneCount >= 2) {
+        lane = (lane + 1 + Math.floor(Math.random() * 3)) % 4;
+      }
+
+      if (lane === lastLane) {
+        sameLaneCount += 1;
+      } else {
+        lastLane = lane;
+        sameLaneCount = 1;
+      }
+
+      return lane;
+    }
+
+    function chooseDoubleLanes() {
+      const firstLane = chooseLane();
+      const candidates = [0, 1, 2, 3].filter((lane) => lane !== firstLane);
+      const secondLane = candidates[Math.floor(Math.random() * candidates.length)];
+      return [firstLane, secondLane].sort((a, b) => a - b);
+    }
+
+    function randomBetween(min, max) {
+      return min + Math.random() * (max - min);
+    }
+
+    function moveTiles(delta, now) {
+      const settings = ROUND_SETTINGS[currentRoundIndex];
+      const speed = getNoteSpeed(settings);
+
+      for (const note of [...tiles]) {
+        note.y += speed * delta;
+        const top = getNoteTop(note);
+
+        for (const tile of note.elements) {
+          tile.style.transform = "translate3d(0, " + top + "px, 0)";
+        }
+
+        if (note.type === "hold") {
+          if (!checkHoldNote(note, delta)) {
+            return;
+          }
+        } else if (note.type === "double") {
+          if (!checkDoubleNote(note, now)) {
+            return;
+          }
+        } else if (note.y > judgeY + hitWindow) {
+          missGame("타일을 놓쳤어요.");
+          return;
+        }
+      }
+    }
+
+    function checkDoubleNote(note, now) {
+      if (note.hitLanes.size > 0 && note.hitLanes.size < note.lanes.length && now - note.firstHitAt > DOUBLE_GRACE_MS) {
+        missGame("동시 노트의 두 버튼을 거의 같이 눌러야 해요.");
+        return false;
+      }
+
+      if (note.y > judgeY + hitWindow) {
+        missGame("동시 노트를 놓쳤어요.");
+        return false;
+      }
+
+      return true;
+    }
+
+    function checkHoldNote(note, delta) {
+      const lane = note.lanes[0];
+
+      if (!note.holdStarted && note.y > judgeY + HOLD_START_WINDOW) {
+        missGame("롱 노트 시작을 놓쳤어요.");
+        return false;
+      }
+
+      if (note.holdStarted && !note.holdCompleted) {
+        // 롱노트는 완벽히 계속 누르지 않아도 됩니다. 누른 시간과 손을 뗀 시간을 따로 셉니다.
+        if (pressedLanes.has(lane)) {
+          note.holdTime += delta;
+          note.releasedTime = 0;
+          note.elements.forEach((tile) => {
+            tile.classList.add("is-holding");
+            tile.classList.remove("is-release-gap");
+          });
+        } else {
+          note.releasedTime += delta;
+          note.elements.forEach((tile) => {
+            tile.classList.remove("is-holding");
+            tile.classList.add("is-release-gap");
+          });
+
+          if (note.releasedTime > note.allowedReleaseMs) {
+            missGame("롱 노트를 너무 오래 놓았어요.");
+            return false;
+          }
+        }
+
+        if (getHoldTailY(note) >= judgeY) {
+          // 끝 지점에 도착했을 때 전체 길이의 50% 이상 눌렀으면 성공입니다.
+          return completeHoldNote(note);
+        }
+      }
+
+      return true;
+    }
+
+    function handleLanePress(lane) {
+      if (gameState !== "playing") {
+        return;
+      }
+
+      // 롱노트를 다시 잡는 입력은 새 노트 판정으로 보지 않습니다.
+      if (findActiveHoldInLane(lane)) {
+        return;
+      }
+
+      const target = findClosestNoteInLane(lane);
+      if (!target) {
+        missGame("빈 라인을 눌렀어요.");
+        return;
+      }
+
+      const distance = Math.abs(target.y - judgeY);
+      const windowSize = target.type === "hold" ? HOLD_START_WINDOW : hitWindow;
+      if (distance <= windowSize) {
+        if (target.type === "hold") {
+          startHoldNote(target, lane);
+        } else if (target.type === "double") {
+          hitDoubleLane(target, lane);
+        } else {
+          completeNote(target, "GOOD!");
+        }
+      } else {
+        missGame("타이밍이 조금 달랐어요.");
+      }
+    }
+
+    function handleLaneRelease(lane) {
+      // 롱노트는 300ms 이하의 짧은 손 떼짐을 허용하므로 여기서 바로 실패시키지 않습니다.
+      return lane;
+    }
+
+    function findActiveHoldInLane(lane) {
+      return tiles.find((note) => (
+        note.type === "hold" &&
+        note.holdStarted &&
+        !note.holdCompleted &&
+        note.lanes[0] === lane
+      ));
+    }
+
+    function findClosestNoteInLane(lane) {
+      let closest = null;
+      let bestDistance = Infinity;
+
+      for (const note of tiles) {
+        if (note.judged || !note.lanes.includes(lane)) {
+          continue;
+        }
+
+        if (note.type === "double" && note.hitLanes.has(lane)) {
+          continue;
+        }
+
+        if (note.type === "hold" && note.holdStarted) {
+          continue;
+        }
+
+        const distance = Math.abs(note.y - judgeY);
+        if (distance < bestDistance) {
+          bestDistance = distance;
+          closest = note;
+        }
+      }
+
+      return closest;
+    }
+
+    function startHoldNote(note) {
+      note.holdStarted = true;
+      note.firstHitAt = performance.now();
+      note.holdTime = 0;
+      note.releasedTime = 0;
+      note.elements.forEach((tile) => tile.classList.add("is-holding"));
+      showHitBubble("GOOD!");
+    }
+
+    function hitDoubleLane(note, lane) {
+      const now = performance.now();
+
+      if (note.hitLanes.size > 0 && now - note.firstHitAt > DOUBLE_GRACE_MS) {
+        missGame("동시 노트의 두 버튼을 거의 같이 눌러야 해요.");
+        return;
+      }
+
+      note.hitLanes.add(lane);
+
+      if (!note.firstHitAt) {
+        note.firstHitAt = now;
+      }
+
+      const tile = getTileForLane(note, lane);
+      if (tile) {
+        tile.classList.add("is-hit");
+      }
+
+      if (note.hitLanes.size === note.lanes.length) {
+        completeNote(note, "PERFECT!");
+      } else {
+        showHitBubble("GOOD!");
+      }
+    }
+
+    function completeHoldNote(note) {
+      const requiredHoldTime = note.duration * note.requiredHoldRatio;
+      const holdRatio = note.duration > 0 ? note.holdTime / note.duration : 1;
+
+      if (note.holdTime < requiredHoldTime) {
+        missGame("롱 노트를 조금 더 눌러야 해요.");
+        return false;
+      }
+
+      note.holdCompleted = true;
+      completeNote(note, holdRatio >= HOLD_PERFECT_RATIO ? "PERFECT!" : "잘했어요!");
+      return true;
+    }
+
+    function completeNote(note, word) {
+      note.judged = true;
+      score += note.lanes.length;
+      combo += note.lanes.length;
+      updateHud();
+      showHitBubble(word);
+
+      const top = getNoteTop(note);
+      for (const tile of note.elements) {
+        tile.style.opacity = "0";
+        tile.style.transform = "translate3d(0, " + (top + 12) + "px, 0) scale(1.08)";
+      }
+
+      window.setTimeout(() => {
+        note.elements.forEach((tile) => tile.remove());
+      }, 90);
+
+      tiles = tiles.filter((item) => item !== note);
+    }
+
+    function getTileForLane(note, lane) {
+      return note.elements.find((tile) => Number(tile.dataset.lane) === lane);
+    }
+
+    function missGame(reason) {
+      if (gameState !== "playing") {
+        return;
+      }
+
+      gameState = "miss";
+      combo = 0;
+      updateHud();
+      statusText.textContent = "실패: " + reason;
+
+      stopAnimation();
+      stopRoundClock();
+      audio.pause();
+      resetPressedInputs();
+      showResult("miss");
+    }
+
+    function finishRound() {
+      if (gameState !== "playing") {
+        return;
+      }
+
+      stopAnimation();
+      stopRoundClock();
+      resetPressedInputs();
+      clearTiles();
+
+      if (currentRoundIndex < TOTAL_ROUNDS - 1) {
+        gameState = "round-clear";
+        showResult("round-clear");
+      } else {
+        gameState = "clear";
+        audio.pause();
+        showResult("final-clear");
+      }
+    }
+
+    function showResult(type) {
+      showScreen("result");
+      resultArt.classList.toggle("is-clear", type === "round-clear" || type === "final-clear");
+      resultArt.classList.toggle("is-miss", type === "miss");
+
+      if (type === "round-clear") {
+        const nextSettings = ROUND_SETTINGS[currentRoundIndex + 1];
+        resultTitle.textContent = "라운드 " + ROUND_SETTINGS[currentRoundIndex].round + " 성공!";
+        resultSubtitle.textContent = "다음은 속도 x" + nextSettings.rate.toFixed(1);
+        retryButton.textContent = "다음 라운드";
+      } else if (type === "final-clear") {
+        resultTitle.textContent = "전체 클리어!";
+        resultSubtitle.textContent = "멋지게 해냈어요!";
+        retryButton.textContent = "처음부터 다시";
+      } else {
+        resultTitle.textContent = "괜찮아요!";
+        resultSubtitle.textContent = "다시 누르면 처음부터 시작해요.";
+        retryButton.textContent = "다시하기";
+      }
+    }
+
+    function showRoundBubble(text) {
+      roundBubble.textContent = text;
+      roundBubble.classList.add("show");
+      window.setTimeout(() => {
+        roundBubble.classList.remove("show");
+      }, 720);
+    }
+
+    function showHitBubble(word) {
+      const message = word || HIT_WORDS[Math.floor(Math.random() * HIT_WORDS.length)];
+      hitBubble.textContent = message;
+      hitBubble.classList.remove("is-perfect", "is-good");
+      hitBubble.classList.add(message.includes("PERFECT") ? "is-perfect" : "is-good");
+      hitBubble.classList.add("show");
+      flashJudgeLine();
+      window.clearTimeout(showHitBubble.timer);
+      showHitBubble.timer = window.setTimeout(() => {
+        hitBubble.classList.remove("show");
+      }, 180);
+    }
+
+    function flashJudgeLine() {
+      judgeLine.classList.remove("is-flash");
+      // 같은 프레임에 연속 성공해도 애니메이션이 다시 시작되게 합니다.
+      void judgeLine.offsetWidth;
+      judgeLine.classList.add("is-flash");
+      window.clearTimeout(flashJudgeLine.timer);
+      flashJudgeLine.timer = window.setTimeout(() => {
+        judgeLine.classList.remove("is-flash");
+      }, 190);
+    }
+
+    function setButtonPressed(lane, isPressed) {
+      const button = laneButtons[lane];
+      button.classList.toggle("is-pressed", isPressed);
+    }
+
+    function addLanePress(lane) {
+      lanePressCounts[lane] += 1;
+      pressedLanes.add(lane);
+      setButtonPressed(lane, true);
+    }
+
+    function removeLanePress(lane) {
+      lanePressCounts[lane] = Math.max(0, lanePressCounts[lane] - 1);
+
+      if (lanePressCounts[lane] === 0) {
+        pressedLanes.delete(lane);
+        setButtonPressed(lane, false);
+        handleLaneRelease(lane);
+      }
+    }
+
+    function resetPressedInputs() {
+      pressedLanes = new Set();
+      activeKeys = new Set();
+      activePointers = new Map();
+      lanePressCounts = [0, 0, 0, 0];
+      laneButtons.forEach((button) => button.classList.remove("is-pressed"));
+    }
+
+    function handleKeyDown(event) {
+      const keyMap = {
+        d: 0,
+        f: 1,
+        j: 2,
+        k: 3,
+        "1": 0,
+        "2": 1,
+        "3": 2,
+        "4": 3
+      };
+
+      const lane = keyMap[event.key.toLowerCase()];
+      if (lane === undefined) {
+        return;
+      }
+
+      event.preventDefault();
+
+      if (event.repeat || activeKeys.has(event.key.toLowerCase())) {
+        return;
+      }
+
+      activeKeys.add(event.key.toLowerCase());
+      addLanePress(lane);
+      handleLanePress(lane);
+    }
+
+    function handleKeyUp(event) {
+      const keyMap = {
+        d: 0,
+        f: 1,
+        j: 2,
+        k: 3,
+        "1": 0,
+        "2": 1,
+        "3": 2,
+        "4": 3
+      };
+
+      const key = event.key.toLowerCase();
+      const lane = keyMap[key];
+      if (lane === undefined || !activeKeys.has(key)) {
+        return;
+      }
+
+      event.preventDefault();
+      activeKeys.delete(key);
+      removeLanePress(lane);
+    }
+
+    function bindEvents() {
+      startButton.addEventListener("click", startGame);
+      retryButton.addEventListener("click", () => {
+        if (gameState === "round-clear") {
+          currentRoundIndex += 1;
+          showScreen("game");
+          updateHud();
+          measurePlayfield();
+          startRound();
+        } else {
+          startGame();
+        }
+      });
+
+      for (const button of laneButtons) {
+        button.addEventListener("pointerdown", (event) => {
+          event.preventDefault();
+          const lane = Number(button.dataset.lane);
+          activePointers.set(event.pointerId, lane);
+
+          if (button.setPointerCapture) {
+            button.setPointerCapture(event.pointerId);
+          }
+
+          addLanePress(lane);
+          handleLanePress(lane);
+        });
+
+        button.addEventListener("pointerup", (event) => {
+          event.preventDefault();
+          const lane = activePointers.get(event.pointerId);
+
+          if (lane !== undefined) {
+            activePointers.delete(event.pointerId);
+            removeLanePress(lane);
+          }
+        });
+
+        button.addEventListener("pointercancel", (event) => {
+          const lane = activePointers.get(event.pointerId);
+
+          if (lane !== undefined) {
+            activePointers.delete(event.pointerId);
+            removeLanePress(lane);
+          }
+        });
+      }
+
+      document.addEventListener("keydown", handleKeyDown);
+      document.addEventListener("keyup", handleKeyUp);
+      audio.addEventListener("ended", finishRound);
+      audio.addEventListener("error", () => {
+        if (gameState === "start") {
+          audioNote.textContent = "assets/music/sena_song.mp3 파일을 넣으면 노래와 함께 시작됩니다.";
+        }
+      });
+
+      window.addEventListener("resize", () => {
+        if (gameState === "playing") {
+          measurePlayfield();
+        }
+      });
+
+      document.addEventListener("visibilitychange", () => {
+        if (document.hidden && gameState === "playing") {
+          missGame("화면이 잠시 멈췄어요.");
+        }
+      });
+    }
+
+    setupStartScreenImage();
+    bindEvents();
+    updateHud();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./service-worker.js")
+          .then(() => console.log("Service Worker registered"))
+          .catch((error) => console.log("Service Worker registration failed:", error));
+      });
+    }
+  </script>
+</body>
+</html>
