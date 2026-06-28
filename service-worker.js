@@ -1,4 +1,4 @@
-const CACHE_NAME = "sena-rhythm-game-v1";
+const CACHE_NAME = "sena-rhythm-game-v4";
 
 // sena_song.mp3 또는 이미지가 바뀌면 CACHE_NAME의 버전을 올려야 새 파일이 반영됩니다.
 const CORE_ASSETS = [
