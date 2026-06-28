@@ -277,7 +277,7 @@
 
     .hud {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, 1fr);
       gap: 6px;
       min-height: 68px;
       padding: 4px;
@@ -338,12 +338,17 @@
     }
 
     .hud-value {
+      display: inline-block;
       margin-top: 2px;
       color: #fff;
-      font-size: clamp(19px, 5vw, 27px);
+      font-size: clamp(16px, 4.4vw, 25px);
       font-weight: 950;
       white-space: nowrap;
       text-shadow: 0 3px 0 #5a229b, 0 0 10px rgba(255, 255, 255, 0.45);
+    }
+
+    .hud-value.is-pop {
+      animation: comboPop 300ms ease-out;
     }
 
     .playfield {
@@ -405,6 +410,8 @@
     .tile {
       position: absolute;
       overflow: hidden;
+      display: grid;
+      place-items: center;
       border: 3px solid rgba(255, 255, 255, 0.9);
       border-radius: 9px;
       background:
@@ -430,6 +437,23 @@
         0 12px 20px rgba(40, 8, 87, 0.22);
     }
 
+    .tile.is-hold {
+      border-color: rgba(255, 245, 169, 0.95);
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.14) 16%, rgba(21, 6, 54, 0.5) 100%),
+        var(--tile-color, #ff75b7);
+      box-shadow:
+        inset 0 4px 0 rgba(255, 255, 255, 0.54),
+        inset 0 -14px 0 rgba(18, 6, 44, 0.2),
+        0 0 22px rgba(255, 235, 128, 0.35),
+        0 8px 0 rgba(70, 22, 110, 0.24),
+        0 14px 22px rgba(40, 8, 87, 0.22);
+    }
+
+    .tile.is-holding {
+      animation: holdingGlow 360ms ease-in-out infinite alternate;
+    }
+
     .tile.is-near {
       animation: nearNoteGlow 420ms ease-in-out infinite alternate;
       outline: 4px solid rgba(255, 244, 153, 0.78);
@@ -445,7 +469,7 @@
     .tile::after {
       content: "♪";
       position: absolute;
-      color: rgba(255, 255, 255, 0.84);
+      color: rgba(255, 255, 255, 0.22);
       font-weight: 950;
       text-shadow: 0 2px 0 rgba(91, 31, 132, 0.22), 0 0 8px rgba(255, 255, 255, 0.8);
       pointer-events: none;
@@ -472,6 +496,23 @@
       color: #fff8a8;
     }
 
+    .tile-number {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      place-items: center;
+      width: 1.75em;
+      height: 1.75em;
+      border-radius: 50%;
+      background: rgba(27, 8, 72, 0.34);
+      color: #fff;
+      font-size: clamp(32px, 9vw, 48px);
+      font-weight: 950;
+      line-height: 1;
+      text-shadow: 0 3px 0 rgba(42, 14, 88, 0.58), 0 0 12px rgba(255, 255, 255, 0.72);
+      box-shadow: inset 0 2px 0 rgba(255, 255, 255, 0.24), 0 0 18px rgba(255, 255, 255, 0.22);
+    }
+
     @keyframes nearNoteGlow {
       from {
         filter: brightness(1.08);
@@ -485,6 +526,37 @@
           0 0 26px rgba(255, 244, 153, 0.92),
           0 8px 0 rgba(70, 22, 110, 0.26),
           0 14px 24px rgba(40, 8, 87, 0.24);
+      }
+    }
+
+    @keyframes holdingGlow {
+      from {
+        filter: brightness(1.12);
+      }
+
+      to {
+        filter: brightness(1.34);
+        box-shadow:
+          inset 0 4px 0 rgba(255, 255, 255, 0.64),
+          inset 0 -14px 0 rgba(18, 6, 44, 0.14),
+          0 0 30px rgba(255, 245, 148, 0.8),
+          0 8px 0 rgba(70, 22, 110, 0.22),
+          0 14px 24px rgba(40, 8, 87, 0.2);
+      }
+    }
+
+    @keyframes comboPop {
+      0% {
+        transform: scale(1);
+      }
+
+      45% {
+        transform: scale(1.25);
+        text-shadow: 0 3px 0 #5a229b, 0 0 18px rgba(255, 241, 120, 0.95);
+      }
+
+      100% {
+        transform: scale(1);
       }
     }
 
@@ -649,9 +721,73 @@
         0 0 34px rgba(255, 226, 97, 0.82);
     }
 
+    .hit-bubble.is-miss {
+      background: linear-gradient(180deg, #ffe5f5, #ff6caf 54%, #c72b83);
+      text-shadow: 0 3px 0 #8f1b70, 0 0 12px rgba(255, 255, 255, 0.56);
+      box-shadow:
+        inset 0 3px 0 rgba(255, 255, 255, 0.55),
+        0 7px 0 #7e218c,
+        0 0 28px rgba(255, 150, 207, 0.62);
+    }
+
     .hit-bubble.show {
       opacity: 1;
       transform: translate(-50%, -60%) scale(1.1);
+    }
+
+    .countdown-overlay {
+      position: absolute;
+      inset: 0;
+      z-index: 8;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      opacity: 0;
+      transform: scale(0.96);
+      transition: opacity 140ms ease, transform 140ms ease;
+    }
+
+    .countdown-overlay.show {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    .countdown-number {
+      min-width: 148px;
+      padding: 22px 26px 26px;
+      border: 4px solid rgba(255, 231, 104, 0.95);
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 32% 18%, rgba(255, 255, 255, 0.54), transparent 22%),
+        linear-gradient(180deg, rgba(186, 86, 255, 0.94), rgba(90, 28, 188, 0.96));
+      color: #fff;
+      font-size: clamp(48px, 16vw, 86px);
+      font-weight: 950;
+      line-height: 1;
+      text-align: center;
+      text-shadow: 0 5px 0 rgba(59, 20, 126, 0.62), 0 0 18px rgba(255, 255, 255, 0.72);
+      box-shadow:
+        inset 0 4px 0 rgba(255, 255, 255, 0.38),
+        0 8px 0 rgba(86, 32, 143, 0.48),
+        0 0 42px rgba(255, 216, 91, 0.62);
+      animation: countdownPop 740ms ease-out;
+    }
+
+    @keyframes countdownPop {
+      0% {
+        transform: scale(0.74);
+        opacity: 0;
+      }
+
+      26% {
+        transform: scale(1.12);
+        opacity: 1;
+      }
+
+      100% {
+        transform: scale(1);
+        opacity: 1;
+      }
     }
 
     .touch-pad {
@@ -929,6 +1065,10 @@
           <span class="hud-label">라운드</span>
           <strong id="roundValue" class="hud-value">1/3</strong>
         </div>
+        <div class="hud-item">
+          <span class="hud-label">실수</span>
+          <strong id="missValue" class="hud-value">0/5</strong>
+        </div>
       </div>
 
       <div id="playfield" class="playfield">
@@ -943,24 +1083,25 @@
         <div id="judgeLine" class="judge-line" aria-hidden="true"></div>
         <div id="roundBubble" class="round-bubble" aria-live="polite"></div>
         <div id="hitBubble" class="hit-bubble" aria-live="polite">좋아요!</div>
+        <div id="countdownOverlay" class="countdown-overlay" aria-live="polite"></div>
       </div>
 
       <div class="touch-pad" aria-label="터치 버튼">
         <button class="lane-button" data-lane="0" type="button" aria-label="1번 라인">
-          <span class="button-note">♪</span>
-          <span class="button-key">D / 1</span>
+          <span class="button-note">1</span>
+          <span class="button-key">D</span>
         </button>
         <button class="lane-button" data-lane="1" type="button" aria-label="2번 라인">
-          <span class="button-note">♪</span>
-          <span class="button-key">F / 2</span>
+          <span class="button-note">2</span>
+          <span class="button-key">F</span>
         </button>
         <button class="lane-button" data-lane="2" type="button" aria-label="3번 라인">
-          <span class="button-note">♪</span>
-          <span class="button-key">J / 3</span>
+          <span class="button-note">3</span>
+          <span class="button-key">J</span>
         </button>
         <button class="lane-button" data-lane="3" type="button" aria-label="4번 라인">
-          <span class="button-note">♪</span>
-          <span class="button-key">K / 4</span>
+          <span class="button-note">4</span>
+          <span class="button-key">K</span>
         </button>
       </div>
     </section>
@@ -988,17 +1129,25 @@
     const SONG_PATH = "assets/music/sena_song.mp3";
     const TOTAL_ROUNDS = 3;
     const ROUND_SETTINGS = [
-      { round: 1, rate: 1.0, spawnInterval: 540, travelMs: 1920, doubleChance: 0.22 },
-      { round: 2, rate: 1.5, spawnInterval: 460, travelMs: 1390, doubleChance: 0.23 },
-      { round: 3, rate: 2.0, spawnInterval: 390, travelMs: 1100, doubleChance: 0.24 }
+      { round: 1, rate: 1.0, spawnInterval: 540, travelMs: 2260, doubleChance: 0.22, holdChance: 0.12 },
+      { round: 2, rate: 1.2, spawnInterval: 460, travelMs: 1640, doubleChance: 0.23, holdChance: 0.13 },
+      { round: 3, rate: 1.5, spawnInterval: 390, travelMs: 1295, doubleChance: 0.24, holdChance: 0.14 }
     ];
 
-    const TAP_NOTE_HEIGHT = 130;
+    const TAP_NOTE_HEIGHT = 92;
+    const HOLD_NOTE_HEIGHT = TAP_NOTE_HEIGHT * 2;
+    const TILE_WIDTH_RATIO = 0.66;
     const NOTE_START_Y = -90;
     const DOUBLE_GRACE_MS = 300;
     const TAP_HIT_WINDOW_MIN = 150;
     const TAP_HIT_WINDOW_MAX = 160;
+    const HOLD_HIT_WINDOW = 190;
+    const HOLD_DURATION_MS = 900;
+    const HOLD_REQUIRED_RATIO = 0.1;
+    const HOLD_ALLOWED_RELEASE_MS = 700;
     const MISS_LATE_WINDOW = 180;
+    const MAX_MISSES = 5;
+    const COUNTDOWN_STEP_MS = 750;
     const TILE_COLORS = ["#ff4fa3", "#ffc928", "#25b7ff", "#9a54ff"];
     const HIT_WORDS = ["GOOD!", "PERFECT!", "잘했어요!", "반짝!"];
 
@@ -1013,11 +1162,13 @@
     const judgeLine = document.getElementById("judgeLine");
     const roundBubble = document.getElementById("roundBubble");
     const hitBubble = document.getElementById("hitBubble");
+    const countdownOverlay = document.getElementById("countdownOverlay");
     const statusText = document.getElementById("statusText");
     const scoreValue = document.getElementById("scoreValue");
     const comboValue = document.getElementById("comboValue");
     const speedValue = document.getElementById("speedValue");
     const roundValue = document.getElementById("roundValue");
+    const missValue = document.getElementById("missValue");
     const resultArt = document.getElementById("resultArt");
     const resultTitle = document.getElementById("resultTitle");
     const resultSubtitle = document.getElementById("resultSubtitle");
@@ -1030,6 +1181,7 @@
     let gameState = "start";
     let score = 0;
     let combo = 0;
+    let missCount = 0;
     let currentRoundIndex = 0;
     let tiles = [];
     let nextNoteId = 1;
@@ -1040,6 +1192,7 @@
     let sameLaneCount = 0;
     let specialNoteCooldown = 0;
     let roundClockTimer = 0;
+    let countdownTimer = 0;
     let usingFallbackClock = false;
     let playfieldRect = null;
     let judgeY = 0;
@@ -1076,6 +1229,7 @@
       comboValue.textContent = String(combo);
       speedValue.textContent = "x" + settings.rate.toFixed(1);
       roundValue.textContent = settings.round + "/" + TOTAL_ROUNDS;
+      missValue.textContent = missCount + "/" + MAX_MISSES;
     }
 
     function measurePlayfield() {
@@ -1093,14 +1247,15 @@
 
     function updateTileLayout() {
       for (const note of tiles) {
-        const tileWidth = laneWidth * 0.94;
+        const tileWidth = Math.max(laneWidth * 0.6, laneWidth * TILE_WIDTH_RATIO);
+        const tileLeftOffset = (laneWidth - tileWidth) / 2;
         const top = getNoteTop(note);
 
         for (const tile of note.elements) {
           const lane = Number(tile.dataset.lane);
           tile.style.width = tileWidth + "px";
           tile.style.height = note.height + "px";
-          tile.style.left = (lane * laneWidth + laneWidth * 0.03) + "px";
+          tile.style.left = (lane * laneWidth + tileLeftOffset) + "px";
           tile.style.transform = "translate3d(0, " + top + "px, 0)";
         }
       }
@@ -1109,10 +1264,12 @@
     function resetGameValues() {
       stopAnimation();
       stopRoundClock();
+      stopCountdown();
       audio.pause();
       audio.currentTime = 0;
       score = 0;
       combo = 0;
+      missCount = 0;
       currentRoundIndex = 0;
       nextNoteId = 1;
       lastLane = -1;
@@ -1130,22 +1287,70 @@
 
     function startGame() {
       resetGameValues();
-      gameState = "playing";
       showScreen("game");
       measurePlayfield();
-      startRound();
+      beginCountdownForRound();
+    }
+
+    function beginCountdownForRound() {
+      const settings = ROUND_SETTINGS[currentRoundIndex];
+      stopAnimation();
+      stopRoundClock();
+      stopCountdown();
+      clearTiles();
+      resetPressedInputs();
+      audio.pause();
+      missCount = 0;
+      gameState = "countdown";
+      showScreen("game");
+      measurePlayfield();
+      updateHud();
+
+      const steps = ["3", "2", "1", "시작!"];
+      let stepIndex = 0;
+
+      const showStep = () => {
+        countdownOverlay.innerHTML = '<div class="countdown-number">' + steps[stepIndex] + "</div>";
+        countdownOverlay.classList.add("show");
+        stepIndex += 1;
+
+        if (stepIndex < steps.length) {
+          countdownTimer = window.setTimeout(showStep, COUNTDOWN_STEP_MS);
+          return;
+        }
+
+        countdownTimer = window.setTimeout(() => {
+          stopCountdown();
+          startRound();
+        }, COUNTDOWN_STEP_MS);
+      };
+
+      showRoundBubble("라운드 " + settings.round + "  x" + settings.rate.toFixed(1));
+      showStep();
+    }
+
+    function stopCountdown() {
+      if (countdownTimer) {
+        window.clearTimeout(countdownTimer);
+        countdownTimer = 0;
+      }
+
+      if (countdownOverlay) {
+        countdownOverlay.classList.remove("show");
+        countdownOverlay.innerHTML = "";
+      }
     }
 
     function startRound() {
       const settings = ROUND_SETTINGS[currentRoundIndex];
       clearTiles();
+      missCount = 0;
       updateHud();
       measurePlayfield();
       showRoundBubble("라운드 " + settings.round + "  x" + settings.rate.toFixed(1));
 
       lastFrameTime = performance.now();
-      seedOpeningNotes(settings);
-      nextSpawnAt = lastFrameTime + settings.spawnInterval;
+      nextSpawnAt = lastFrameTime + 120;
       gameState = "playing";
       startAnimation();
       playSongForRound(settings);
@@ -1217,6 +1422,10 @@
       const jitter = Math.random() * 70 - 35;
       const baseDelay = Math.max(290, settings.spawnInterval + jitter);
 
+      if (previousNote && previousNote.type === "hold") {
+        return Math.max(baseDelay + 180, settings.spawnInterval + 210);
+      }
+
       return baseDelay;
     }
 
@@ -1272,6 +1481,7 @@
       const lanes = type === "double" ? chooseDoubleLanes() : [chooseLane()];
       const speed = getNoteSpeed(settings);
       const now = performance.now();
+      const height = type === "hold" ? HOLD_NOTE_HEIGHT : TAP_NOTE_HEIGHT;
 
       const note = {
         id: nextNoteId,
@@ -1279,11 +1489,18 @@
         lanes,
         spawnTime: now,
         hitTime: now + (judgeY - NOTE_START_Y) / speed,
+        duration: type === "hold" ? HOLD_DURATION_MS : 0,
+        holdStarted: false,
+        holdCompleted: false,
+        holdTime: 0,
+        releasedTime: 0,
+        requiredHoldRatio: HOLD_REQUIRED_RATIO,
+        allowedReleaseMs: HOLD_ALLOWED_RELEASE_MS,
         judged: false,
         hitLanes: new Set(),
         firstHitAt: 0,
         y: initialY,
-        height: TAP_NOTE_HEIGHT,
+        height,
         elements: []
       };
 
@@ -1299,6 +1516,15 @@
         if (type === "double") {
           tile.classList.add("is-double");
         }
+
+        if (type === "hold") {
+          tile.classList.add("is-hold");
+        }
+
+        const number = document.createElement("span");
+        number.className = "tile-number";
+        number.textContent = String(lane + 1);
+        tile.appendChild(number);
 
         note.elements.push(tile);
         tileLayer.appendChild(tile);
@@ -1318,7 +1544,9 @@
       const roll = Math.random();
       let type = "tap";
 
-      if (roll < settings.doubleChance) {
+      if (roll < settings.holdChance) {
+        type = "hold";
+      } else if (roll < settings.holdChance + settings.doubleChance) {
         type = "double";
       }
 
@@ -1373,8 +1601,12 @@
           if (!checkDoubleNote(note, now)) {
             return;
           }
+        } else if (note.type === "hold") {
+          if (!checkHoldNote(note, delta)) {
+            return;
+          }
         } else if (noteMissedLate(note)) {
-          missGame("타일을 놓쳤어요.");
+          missGame("타일을 놓쳤어요.", note);
           return;
         }
       }
@@ -1389,7 +1621,8 @@
         return;
       }
 
-      const isNear = noteOverlapsJudge(note, hitWindow);
+      const readyWindow = note.type === "hold" ? HOLD_HIT_WINDOW : hitWindow;
+      const isNear = noteOverlapsJudge(note, readyWindow);
 
       note.elements.forEach((tile) => {
         tile.classList.toggle("is-near", isNear);
@@ -1402,12 +1635,61 @@
 
     function checkDoubleNote(note, now) {
       if (note.hitLanes.size > 0 && note.hitLanes.size < note.lanes.length && now - note.firstHitAt > DOUBLE_GRACE_MS) {
-        missGame("동시 노트의 두 버튼을 거의 같이 눌러야 해요.");
+        missGame("동시 노트의 두 버튼을 거의 같이 눌러야 해요.", note);
         return false;
       }
 
       if (noteMissedLate(note)) {
-        missGame("동시 노트를 놓쳤어요.");
+        missGame("동시 노트를 놓쳤어요.", note);
+        return false;
+      }
+
+      return true;
+    }
+
+    function checkHoldNote(note, delta) {
+      const lane = note.lanes[0];
+      const isPressed = pressedLanes.has(lane);
+
+      if (note.holdStarted) {
+        if (isPressed) {
+          note.holdTime += delta;
+          note.releasedTime = 0;
+          note.elements.forEach((tile) => tile.classList.add("is-holding"));
+
+          if (note.holdTime >= note.duration * note.requiredHoldRatio) {
+            completeNote(note, note.holdTime >= note.duration * 0.8 ? "PERFECT!" : "잘했어요!");
+            return true;
+          }
+        } else {
+          note.releasedTime += delta;
+          note.elements.forEach((tile) => tile.classList.remove("is-holding"));
+
+          if (note.releasedTime > note.allowedReleaseMs) {
+            missGame("롱타일을 너무 오래 놓았어요.", note);
+            return false;
+          }
+        }
+
+        if (noteMissedLate(note)) {
+          if (note.holdTime >= note.duration * note.requiredHoldRatio) {
+            completeNote(note, note.holdTime >= note.duration * 0.8 ? "PERFECT!" : "잘했어요!");
+          } else {
+            missGame("롱타일을 조금 더 눌러야 해요.", note);
+            return false;
+          }
+        }
+
+        return true;
+      }
+
+      if (noteOverlapsJudge(note, HOLD_HIT_WINDOW) && isPressed) {
+        startHoldNote(note);
+        return true;
+      }
+
+      if (noteMissedLate(note)) {
+        missGame("롱타일 시작을 놓쳤어요.", note);
         return false;
       }
 
@@ -1425,15 +1707,36 @@
         return;
       }
 
-      if (noteOverlapsJudge(target, hitWindow)) {
+      if (target.type === "hold" && target.holdStarted) {
+        target.releasedTime = 0;
+        target.elements.forEach((tile) => tile.classList.add("is-holding"));
+        return;
+      }
+
+      const allowedWindow = target.type === "hold" ? HOLD_HIT_WINDOW : hitWindow;
+
+      if (noteOverlapsJudge(target, allowedWindow)) {
         if (target.type === "double") {
           hitDoubleLane(target, lane);
+        } else if (target.type === "hold") {
+          startHoldNote(target);
         } else {
           completeNote(target, "GOOD!");
         }
       } else {
         missGame("타이밍이 조금 달랐어요.");
       }
+    }
+
+    function startHoldNote(note) {
+      if (note.holdStarted) {
+        return;
+      }
+
+      note.holdStarted = true;
+      note.releasedTime = 0;
+      note.elements.forEach((tile) => tile.classList.add("is-holding"));
+      showHitBubble("잘했어요!");
     }
 
     function findClosestNoteInLane(lane) {
@@ -1463,7 +1766,7 @@
       const now = performance.now();
 
       if (note.hitLanes.size > 0 && now - note.firstHitAt > DOUBLE_GRACE_MS) {
-        missGame("동시 노트의 두 버튼을 거의 같이 눌러야 해요.");
+        missGame("동시 노트의 두 버튼을 거의 같이 눌러야 해요.", note);
         return;
       }
 
@@ -1488,9 +1791,15 @@
     function completeNote(note, word) {
       note.judged = true;
       score += note.lanes.length;
-      combo += note.lanes.length;
+      combo += 1;
       updateHud();
-      showHitBubble(word);
+      animateCombo();
+
+      if (combo > 0 && combo % 10 === 0) {
+        showHitBubble(combo + " COMBO!");
+      } else {
+        showHitBubble(word);
+      }
 
       const top = getNoteTop(note);
       for (const tile of note.elements) {
@@ -1505,22 +1814,53 @@
       tiles = tiles.filter((item) => item !== note);
     }
 
+    function animateCombo() {
+      comboValue.classList.remove("is-pop");
+      void comboValue.offsetWidth;
+      comboValue.classList.add("is-pop");
+      window.clearTimeout(animateCombo.timer);
+      animateCombo.timer = window.setTimeout(() => {
+        comboValue.classList.remove("is-pop");
+      }, 300);
+    }
+
     function getTileForLane(note, lane) {
       return note.elements.find((tile) => Number(tile.dataset.lane) === lane);
     }
 
-    function missGame(reason) {
+    function discardNote(note) {
+      if (!note) {
+        return;
+      }
+
+      note.judged = true;
+      note.elements.forEach((tile) => tile.remove());
+      tiles = tiles.filter((item) => item !== note);
+    }
+
+    function missGame(reason, failedNote) {
       if (gameState !== "playing") {
         return;
       }
 
-      gameState = "miss";
+      missCount += 1;
       combo = 0;
       updateHud();
-      statusText.textContent = "실패: " + reason;
+      statusText.textContent = "실수 " + missCount + "/" + MAX_MISSES + ": " + reason;
 
+      if (failedNote) {
+        discardNote(failedNote);
+      }
+
+      if (missCount < MAX_MISSES) {
+        showMissBubble("아쉬워요! " + missCount + "/" + MAX_MISSES);
+        return;
+      }
+
+      gameState = "miss";
       stopAnimation();
       stopRoundClock();
+      stopCountdown();
       audio.pause();
       resetPressedInputs();
       showResult("miss");
@@ -1578,7 +1918,7 @@
     function showHitBubble(word) {
       const message = word || HIT_WORDS[Math.floor(Math.random() * HIT_WORDS.length)];
       hitBubble.textContent = message;
-      hitBubble.classList.remove("is-perfect", "is-good");
+      hitBubble.classList.remove("is-perfect", "is-good", "is-miss");
       hitBubble.classList.add(message.includes("PERFECT") ? "is-perfect" : "is-good");
       hitBubble.classList.add("show");
       flashJudgeLine();
@@ -1586,6 +1926,16 @@
       showHitBubble.timer = window.setTimeout(() => {
         hitBubble.classList.remove("show");
       }, 180);
+    }
+
+    function showMissBubble(message) {
+      hitBubble.textContent = message;
+      hitBubble.classList.remove("is-perfect", "is-good", "is-miss");
+      hitBubble.classList.add("is-miss", "show");
+      window.clearTimeout(showHitBubble.timer);
+      showHitBubble.timer = window.setTimeout(() => {
+        hitBubble.classList.remove("show");
+      }, 460);
     }
 
     function flashJudgeLine() {
@@ -1686,7 +2036,7 @@
           showScreen("game");
           updateHud();
           measurePlayfield();
-          startRound();
+          beginCountdownForRound();
         } else {
           startGame();
         }
@@ -1736,7 +2086,7 @@
       });
 
       window.addEventListener("resize", () => {
-        if (gameState === "playing") {
+        if (gameState === "playing" || gameState === "countdown") {
           measurePlayfield();
         }
       });
